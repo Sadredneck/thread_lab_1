@@ -1,38 +1,46 @@
 package thread.lab1.main;
 
-import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class SearchTaskAlt implements Runnable {
-    private int start;
-    private int end;
-    private List<String> lines;
-    private AtomicInteger outerCounter;
-    private AtomicInteger linesCounter;
+import static java.lang.Thread.sleep;
 
-    public SearchTaskAlt(int start, int end, List<String> words, AtomicInteger outerCounter, AtomicInteger linesCounter) {
-        this.start = start;
-        this.end = end;
+public class SearchTaskAlt implements Runnable {
+
+    private ConcurrentLinkedQueue<String> lines;
+    private AtomicInteger resultSum;
+    private AtomicBoolean isWorking;
+
+    public SearchTaskAlt(ConcurrentLinkedQueue<String> words, AtomicInteger resultSum, AtomicBoolean isWorking) {
         this.lines = words;
-        this.outerCounter = outerCounter;
-        this.linesCounter = linesCounter;
+        this.resultSum = resultSum;
+        this.isWorking = isWorking;
     }
 
     public void run() {
-        for (int i = start; i < end; i++) {
-            outerCounter.addAndGet(readLine(lines.get(i)));
-            linesCounter.incrementAndGet();
+        while (isWorking.get() || !lines.isEmpty()) {
+            String line = lines.poll();
+            if (line != null) {
+                resultSum.addAndGet(readLine(line));
+            } else {
+                try {
+                    Thread.sleep(1);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
     private int readLine(String line) {
         String[] array = line.split(" ");
-        switch (array.length) {
-            case 2:
+        switch (array[0]) {
+            case "circle":
                 return (int) (Integer.valueOf(array[1]) * Math.PI);
-            case 3:
+            case "box":
                 return Integer.valueOf(array[1]) * (Integer.valueOf(array[2]));
-            case 4:
+            case "triangle":
                 return (int) triangleArea(Integer.valueOf(array[1]), Integer.valueOf(array[2]), Integer.valueOf(array[3]));
         }
         return 0;

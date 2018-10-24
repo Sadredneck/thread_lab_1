@@ -1,17 +1,19 @@
 package thread.lab1.main;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class LabOne {
 
     private AtomicInteger resultSum = new AtomicInteger(0);
-    private AtomicInteger linesDone = new AtomicInteger(0);
+    private ConcurrentLinkedQueue<String> lines = new ConcurrentLinkedQueue<>();
+    private AtomicBoolean isWorking = new AtomicBoolean(true);
 
     public int getResultSum() {
         return resultSum.get();
@@ -41,20 +43,35 @@ public class LabOne {
         }
     }
 
-    public void performCalculation(Path inputPath, int threadCount) throws InterruptedException, IOException {
-        ExecutorService executor = Executors.newFixedThreadPool(threadCount);
-        List<String> lines = Files.readAllLines(inputPath);
-        int size = lines.size();
+    public void performCalculation(Path inputPath, int threadCount) throws InterruptedException {
+        Thread tasks[] = new Thread[threadCount];
 
         for (int i = 0; i < threadCount; i++) {
-            Runnable task = new SearchTaskAlt(250_000 * i / threadCount, 250_000 * (i + 1) / threadCount,
-                    lines, resultSum, linesDone);
-            executor.execute(task);
+            tasks[i] = new Thread(new SearchTaskAlt(lines, resultSum, isWorking));
+            tasks[i].start();
         }
-        executor.shutdown();
-        while (!executor.isTerminated()) {
-            System.out.print("\r" + (int) ((linesDone.get() * 100.0f) / size) + " %");
-            Thread.sleep(10);
+
+        try (BufferedReader br = Files.newBufferedReader(inputPath)) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                lines.add(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        this.isWorking.set(false);
+        boolean isWorking = true;
+
+        while (isWorking) {
+            int count = 0;
+            for (int i = 0; i < threadCount; i++) {
+                if (!tasks[i].isAlive())
+                    count++;
+            }
+            if (count == threadCount)
+                isWorking = false;
+            Thread.sleep(1);
         }
         System.out.print("\rDone.");
     }

@@ -17,24 +17,24 @@ public class TimeTest {
     public void timeTestOneToSixteenThreads() throws IOException, InterruptedException {
         for (int j = 1; j <= 16; j++) {
             System.out.println(j + ":");
-            for (int i = 0; i < 100; i++) {
+            for (int i = 0; i < 25; i++) {
                 doTimeCheck(j);
             }
         }
     }
 
     @Test
+    @Ignore
     public void timeTestThreads() throws IOException, InterruptedException {
-        for (int i = 0; i < 100; i++) {
-            doTimeCheck(16);
+        for (int i = 0; i < 25; i++) {
+            doTimeCheck(4);
         }
     }
 
     @Theory
-    @Ignore
     public void timeTestThreads(int threadNumber) throws IOException, InterruptedException {
         System.out.println("\n"+threadNumber + ":\n");
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 25; i++) {
             doTimeCheck(threadNumber);
         }
     }
@@ -46,7 +46,7 @@ public class TimeTest {
     private void doTimeCheck(int threads) throws IOException, InterruptedException {
         LabOne example = new LabOne();
         long start = System.nanoTime();
-        example.performCalculation(Paths.get("lab_1_0.input"), threads);
+        example.performCalculation(Paths.get("lab_1_2.input"), threads);
         long duration = System.nanoTime() - start;
         System.out.println("\r" + duration / 1_000_000);
     }
