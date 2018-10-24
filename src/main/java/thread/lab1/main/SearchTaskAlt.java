@@ -6,12 +6,16 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class SearchTaskAlt implements Runnable {
 
-    private ConcurrentLinkedQueue<String> lines;
+    private ConcurrentLinkedQueue<String> lines = new ConcurrentLinkedQueue<>();
     private AtomicInteger resultSum;
     private AtomicBoolean isWorking;
+    private int count = 0;
 
-    public SearchTaskAlt(ConcurrentLinkedQueue<String> words, AtomicInteger resultSum, AtomicBoolean isWorking) {
-        this.lines = words;
+    public void addElem(String line) {
+        lines.add(line);
+    }
+
+    public SearchTaskAlt(AtomicInteger resultSum, AtomicBoolean isWorking) {
         this.resultSum = resultSum;
         this.isWorking = isWorking;
     }
@@ -21,6 +25,7 @@ public class SearchTaskAlt implements Runnable {
             String line = lines.poll();
             if (line != null) {
                 resultSum.addAndGet(readLine(line));
+                count++;
             } else {
                 try {
                     Thread.sleep(1);
@@ -29,19 +34,28 @@ public class SearchTaskAlt implements Runnable {
                 }
             }
         }
+        //System.out.println(count);
     }
 
     private int readLine(String line) {
         String[] array = line.split(" ");
-        switch (array[0]) {
-            case "circle":
-                return (int) (Integer.valueOf(array[1]) * Math.PI);
-            case "box":
-                return Integer.valueOf(array[1]) * (Integer.valueOf(array[2]));
-            case "triangle":
-                return (int) triangleArea(Integer.valueOf(array[1]), Integer.valueOf(array[2]), Integer.valueOf(array[3]));
-        }
-        return 0;
+        int answer = 0;
+        for (int i = 0; i < 10; i++)
+            switch (array[0]) {
+                case "circle":
+                    answer = (int) (Integer.valueOf(array[1]) * Math.PI);
+                    answer = (int) (Integer.valueOf(array[1]) * Math.PI);
+                    break;
+                case "box":
+                    answer = Integer.valueOf(array[1]) * (Integer.valueOf(array[2]));
+                    answer = Integer.valueOf(array[1]) * (Integer.valueOf(array[2]));
+                    break;
+                case "triangle":
+                    answer = (int) triangleArea(Integer.valueOf(array[1]), Integer.valueOf(array[2]), Integer.valueOf(array[3]));
+                    answer = (int) triangleArea(Integer.valueOf(array[1]), Integer.valueOf(array[2]), Integer.valueOf(array[3]));
+                    break;
+            }
+        return answer;
     }
 
     private double triangleArea(int one, int two, int three) {

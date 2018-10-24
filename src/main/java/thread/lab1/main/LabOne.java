@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class LabOne {
 
     private AtomicInteger resultSum = new AtomicInteger(0);
-    private ConcurrentLinkedQueue<String> lines = new ConcurrentLinkedQueue<>();
+    //    private ConcurrentLinkedQueue<String> lines = new ConcurrentLinkedQueue<>();
     private AtomicBoolean isWorking = new AtomicBoolean(true);
 
     public int getResultSum() {
@@ -43,16 +43,22 @@ public class LabOne {
 
     public void performCalculation(Path inputPath, int threadCount) throws InterruptedException {
         Thread tasks[] = new Thread[threadCount];
+        SearchTaskAlt searchTasks[] = new SearchTaskAlt[threadCount];
 
         for (int i = 0; i < threadCount; i++) {
-            tasks[i] = new Thread(new SearchTaskAlt(lines, resultSum, isWorking));
+            searchTasks[i] = new SearchTaskAlt(resultSum, isWorking);
+            tasks[i] = new Thread(searchTasks[i]);
             tasks[i].start();
         }
 
         try (BufferedReader br = Files.newBufferedReader(inputPath)) {
             String line;
+            int i = 0;
             while ((line = br.readLine()) != null) {
-                lines.add(line);
+                searchTasks[i++ % threadCount].addElem(line);
+                /*if (i == threadCount) {
+                    i = 0;
+                }*/
             }
         } catch (IOException e) {
             e.printStackTrace();
