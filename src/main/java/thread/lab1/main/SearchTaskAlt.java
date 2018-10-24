@@ -4,8 +4,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static java.lang.Thread.sleep;
-
 public class SearchTaskAlt implements Runnable {
 
     private ConcurrentLinkedQueue<String> lines;

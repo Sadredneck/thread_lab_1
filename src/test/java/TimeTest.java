@@ -24,14 +24,14 @@ public class TimeTest {
     }
 
     @Test
-    @Ignore
     public void timeTestThreads() throws IOException, InterruptedException {
-        for (int i = 0; i < 25; i++) {
-            doTimeCheck(4);
+        for (int i = 0; i < 100; i++) {
+            doTimeCheck(16);
         }
     }
 
     @Theory
+    @Ignore
     public void timeTestThreads(int threadNumber) throws IOException, InterruptedException {
         System.out.println("\n"+threadNumber + ":\n");
         for (int i = 0; i < 25; i++) {
