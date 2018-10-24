@@ -36,8 +36,6 @@ public class LabOne {
             System.out.println("\nTime passed: " + duration / 1_000_000 + " ms\nResult: " + example.getResultSum());
         } catch (NumberFormatException e) {
             System.out.println("Can't parse number of threads");
-        } catch (IOException e) {
-            System.out.println("Can't find file buddy");
         } catch (InterruptedException e) {
             System.out.println("There should be at least 1 thread buddy");
         }
