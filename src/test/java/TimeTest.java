@@ -25,8 +25,8 @@ public class TimeTest {
 
     @Test
     public void timeTestThreads() throws IOException, InterruptedException {
-        for (int i = 0; i < 20; i++) {
-            doTimeCheck(4);
+        for (int i = 0; i < 1; i++) {
+            doTimeCheck(1);
         }
     }
 
@@ -43,7 +43,7 @@ public class TimeTest {
     int[] candidates = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
 
 
-    private void doTimeCheck(int threads) throws IOException, InterruptedException {
+    private void doTimeCheck(int threads) throws InterruptedException {
         LabOne example = new LabOne();
         long start = System.nanoTime();
         example.performCalculation(Paths.get("lab_1_4.input"), threads);

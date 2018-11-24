@@ -12,7 +12,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class LabOne {
 
     private AtomicInteger resultSum = new AtomicInteger(0);
-    //    private ConcurrentLinkedQueue<String> lines = new ConcurrentLinkedQueue<>();
     private AtomicBoolean isWorking = new AtomicBoolean(true);
 
     public int getResultSum() {
@@ -56,9 +55,6 @@ public class LabOne {
             int i = 0;
             while ((line = br.readLine()) != null) {
                 searchTasks[i++ % threadCount].addElem(line);
-                /*if (i == threadCount) {
-                    i = 0;
-                }*/
             }
         } catch (IOException e) {
             e.printStackTrace();

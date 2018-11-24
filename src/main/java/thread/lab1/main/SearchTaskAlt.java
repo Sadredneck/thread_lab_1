@@ -34,7 +34,6 @@ public class SearchTaskAlt implements Runnable {
                 }
             }
         }
-        //System.out.println(count);
     }
 
     private int readLine(String line) {
