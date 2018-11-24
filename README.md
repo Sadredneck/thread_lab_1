@@ -1,6 +1,6 @@
-Lab 1
+<h1> Lab 1
 
-FileCreatorVariationOne 
+<h5> FileCreatorVariationOne 
 
 Class uses for creating test files.
 
@@ -9,7 +9,7 @@ Class uses for creating test files.
 A query must contain:
 1. File length as first argument.
 
-LabOne
+<h5> LabOne
 
 Main class.
 
