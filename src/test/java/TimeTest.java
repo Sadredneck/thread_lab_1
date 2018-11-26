@@ -4,7 +4,7 @@ import org.junit.experimental.theories.DataPoints;
 import org.junit.experimental.theories.Theories;
 import org.junit.experimental.theories.Theory;
 import org.junit.runner.RunWith;
-import thread.lab1.main.LabOne;
+import thread.lab1.main.LabTwo;
 
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -44,7 +44,7 @@ public class TimeTest {
 
 
     private void doTimeCheck(int threads) throws InterruptedException {
-        LabOne example = new LabOne();
+        LabTwo example = new LabTwo();
         long start = System.nanoTime();
         example.performCalculation(Paths.get("lab_1_4.input"), threads);
         long duration = System.nanoTime() - start;
