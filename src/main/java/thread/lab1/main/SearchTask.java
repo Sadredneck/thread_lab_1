@@ -1,16 +1,23 @@
 package thread.lab1.main;
 
+import thread.lab1.generator.Figures;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 public class SearchTask implements Runnable {
-
     private ConcurrentLinkedQueue<String> lines = new ConcurrentLinkedQueue<>();
     private AtomicInteger resultSum;
     private AtomicBoolean isWorking;
     private int count = 0;
-    private long usefulTime = 0, uselessTime = 0, difficultyScore = 0;
+    private long usefulTime = 0, waitingTime = 0;
+    private AtomicLong difficultyScore = new AtomicLong(0);
 
     public int getCount() {
         return count;
@@ -20,38 +27,26 @@ public class SearchTask implements Runnable {
         return usefulTime;
     }
 
-    public long getUselessTime() {
-        return uselessTime;
+    public long getWaitingTime() {
+        return waitingTime;
     }
 
     public long getDifficultyScore() {
-        return difficultyScore;
+        return difficultyScore.get();
+    }
+
+    public int getQueueSize() {
+        return lines.size();
     }
 
     public void addElem(String line) {
         lines.add(line);
-        switch (line.split(" ", 2)[0]) {
-            case "circle":
-                difficultyScore += 2;
-                break;
-            case "box":
-                difficultyScore += 1;
-                break;
-            case "triangle":
-                difficultyScore += 4;
-                break;
-            default:
-                difficultyScore += 1;
-        }
+        difficultyScore.addAndGet(Figures.valueOf(line.split(" ", 2)[0]).difficulty);
     }
 
     public SearchTask(AtomicInteger resultSum, AtomicBoolean isWorking) {
         this.resultSum = resultSum;
         this.isWorking = isWorking;
-    }
-
-    public int getQueueSize(){
-        return lines.size();
     }
 
     public void run() {
@@ -63,45 +58,17 @@ public class SearchTask implements Runnable {
                 count++;
                 usefulTime += System.nanoTime() - start;
             } else {
-                try {
-                    Thread.sleep(1);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                uselessTime += System.nanoTime() - start;
+                waitingTime += System.nanoTime() - start;
             }
         }
     }
 
     private int readLine(String line) {
-        String[] array = line.split(" ");
-        int answer = 0;
-        for (int i = 0; i < 10; i++)
-            switch (array[0]) {
-                case "circle":
-                    answer = (int) (Integer.valueOf(array[1]) * Math.PI);
-                    answer = (int) (Integer.valueOf(array[1]) * Math.PI);
-                    difficultyScore -= 2;
-                    break;
-                case "box":
-                    answer = Integer.valueOf(array[1]) * (Integer.valueOf(array[2]));
-                    answer = Integer.valueOf(array[1]) * (Integer.valueOf(array[2]));
-                    difficultyScore -= 1;
-                    break;
-                case "triangle":
-                    answer = (int) triangleArea(Integer.valueOf(array[1]), Integer.valueOf(array[2]), Integer.valueOf(array[3]));
-                    answer = (int) triangleArea(Integer.valueOf(array[1]), Integer.valueOf(array[2]), Integer.valueOf(array[3]));
-                    difficultyScore -= 4;
-                    break;
-            }
-        return answer;
-    }
+        List<String> array = new ArrayList<>(Arrays.asList(line.split(" ")));
+        Figures figure = Figures.valueOf(array.get(0));
 
-    private double triangleArea(int one, int two, int three) {
-        double halfP = (one + two + three) / 2;
-        return Math.sqrt(
-                halfP * (halfP - one) * (halfP - two) * (halfP - three)
-        );
+        difficultyScore.addAndGet(figure.difficulty);
+        return figure.getArea(array.stream().skip(1).map(Integer::valueOf).collect(Collectors.toList()));
     }
 }
 

@@ -11,17 +11,30 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class LabTwo {
-
+    public enum ThreadFunction {ROUND_ROBIN, LEAST_LOADED, PREDICTIVE}
     private AtomicInteger resultSum = new AtomicInteger(0);
     private AtomicBoolean isWorking = new AtomicBoolean(true);
+    private SearchTask searchTasks[];
+
+    public Long[] getWorkingTime() {
+        return Arrays.stream(searchTasks).map(SearchTask::getUsefulTime).toArray(Long[]::new);
+    }
+
+    public Long[] getWaitingTime() {
+        return Arrays.stream(searchTasks).map(SearchTask::getWaitingTime).toArray(Long[]::new);
+    }
+
+    public Integer[] getCount() {
+        return Arrays.stream(searchTasks).map(SearchTask::getCount).toArray(Integer[]::new);
+    }
 
     public int getResultSum() {
         return resultSum.get();
     }
 
     public static void main(String[] args) {
-        if (args.length != 2) {
-            System.out.println("Only two arguments can be passed buddy");
+        if (args.length != 3) {
+            System.out.println("Only three arguments can be passed buddy");
             return;
         }
         try {
@@ -30,10 +43,16 @@ public class LabTwo {
             LabTwo example = new LabTwo();
 
             long start = System.nanoTime();
-            example.performCalculation(Paths.get(args[1]), threadCount);
+            example.performCalculation(Paths.get(args[1]), threadCount, ThreadFunction.valueOf(args[2]));
             long duration = System.nanoTime() - start;
 
             System.out.println("\nTime passed: " + duration / 1_000_000 + " ms\nResult: " + example.getResultSum());
+            for (SearchTask task : example.searchTasks) {
+                long totalTime = task.getUsefulTime() + task.getWaitingTime();
+                System.out.println("\nUseful time: " + (task.getUsefulTime() / totalTime));
+                System.out.println("\nWaiting time: " + (task.getWaitingTime() / totalTime));
+                System.out.println("\nData received: " + (task.getCount() / totalTime));
+            }
         } catch (NumberFormatException e) {
             System.out.println("Can't parse number of threads");
         } catch (InterruptedException e) {
@@ -41,9 +60,9 @@ public class LabTwo {
         }
     }
 
-    public void performCalculation(Path inputPath, int threadCount) throws InterruptedException {
+    public void performCalculation(Path inputPath, int threadCount, ThreadFunction function) throws InterruptedException {
         Thread tasks[] = new Thread[threadCount];
-        SearchTask searchTasks[] = new SearchTask[threadCount];
+        searchTasks = new SearchTask[threadCount];
 
         for (int i = 0; i < threadCount; i++) {
             searchTasks[i] = new SearchTask(resultSum, isWorking);
@@ -51,13 +70,17 @@ public class LabTwo {
             tasks[i].start();
         }
 
-
-
         try (BufferedReader reader = Files.newBufferedReader(inputPath)) {
-            String line;
-            int i = 0;
-            while ((line = reader.readLine()) != null) {
-                searchTasks[i++ % threadCount].addElem(line);
+            switch (function) {
+                case ROUND_ROBIN:
+                    doRoundRobin(reader, searchTasks, threadCount);
+                    break;
+                case LEAST_LOADED:
+                    doLeastLoaded(reader, searchTasks, threadCount);
+                    break;
+                case PREDICTIVE:
+                    doPredictive(reader, searchTasks, threadCount);
+                    break;
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -68,13 +91,14 @@ public class LabTwo {
 
         while (isWorking) {
             int count = 0;
-            for (int i = 0; i < threadCount; i++) {
-                if (!tasks[i].isAlive())
+            for (Thread thread : tasks) {
+                if (!thread.isAlive()) {
                     count++;
+                }
             }
-            if (count == threadCount)
-                isWorking = false;
-            Thread.sleep(1);
+            isWorking = count != threadCount;
+
+            Thread.sleep(0);
         }
         System.out.print("\rDone.");
     }
@@ -96,8 +120,15 @@ public class LabTwo {
 
     private void doPredictive(BufferedReader reader, SearchTask[] searchTasks, int threadCount) throws IOException {
         String line;
+        int count = 0;
+        SearchTask currentTask = searchTasks[0];
         while ((line = reader.readLine()) != null) {
-            Arrays.stream(searchTasks).min(Comparator.comparing(SearchTask::getDifficultyScore)).get().addElem(line);
+            if (count == 0) {
+                currentTask = Arrays.stream(searchTasks).min(Comparator.comparing(SearchTask::getDifficultyScore)).get();
+                count = 100;
+            }
+            currentTask.addElem(line);
+            count--;
         }
     }
 }

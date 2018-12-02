@@ -25,10 +25,9 @@ public class FileCreatorVariationOne {
         }
     }
 
-    public static void createFile(int numberLines) throws IOException {
+    private static void createFile(int numberLines) throws IOException {
         Path path = getAvailableFile();
-        Files.write(path,
-                (Iterable<String>) Stream.generate(Figures::getRandomLine).limit(numberLines)::iterator);
+        Files.write(path, (Iterable<String>) Stream.generate(Figures::getRandomLine).limit(numberLines)::iterator);
     }
 
     private static Path getAvailableFile() {
