@@ -3,7 +3,6 @@ import org.junit.experimental.theories.Theories;
 import org.junit.runner.RunWith;
 import thread.lab1.main.LabTwo;
 
-import java.io.IOException;
 import java.nio.file.Paths;
 
 @RunWith(Theories.class)
@@ -12,7 +11,7 @@ public class TimeTest {
     @Test
     public void timeTestThreads() throws InterruptedException {
         for (int i = 0; i < 1; i++) {
-            doTimeCheck(8, LabTwo.ThreadFunction.PREDICTIVE);
+            doTimeCheck(8, LabTwo.ThreadFunction.LEAST_LOADED);
         }
     }
 
