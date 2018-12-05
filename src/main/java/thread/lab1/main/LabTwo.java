@@ -13,7 +13,6 @@ public class LabTwo {
     interface ThreeParamConsumer<One, Two, Three> {
         void accept(One one, Two two, Three three) throws IOException;
     }
-
     public enum ThreadFunction {
         ROUND_ROBIN((reader, searchTasks, threadCount) -> {
             String line;
@@ -30,7 +29,7 @@ public class LabTwo {
         PREDICTIVE((reader, searchTasks, threadCount) -> {
             String line;
             while ((line = reader.readLine()) != null) {
-                Arrays.stream(searchTasks).min(Comparator.comparing(SearchTask::getQueueSize)).get().addElem(line);
+                Arrays.stream(searchTasks).min(Comparator.comparing(SearchTask::getDifficultyScore)).get().addElem(line);
             }
         });
         private ThreeParamConsumer<BufferedReader, SearchTask[], Integer> consumer;

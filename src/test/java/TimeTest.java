@@ -11,7 +11,7 @@ public class TimeTest {
     @Test
     public void timeTestThreads() throws InterruptedException {
         for (int i = 0; i < 1; i++) {
-            doTimeCheck(8, LabTwo.ThreadFunction.LEAST_LOADED);
+            doTimeCheck(16, LabTwo.ThreadFunction.PREDICTIVE);
         }
     }
 
@@ -25,9 +25,9 @@ public class TimeTest {
         Long[] waiting = example.getWaitingTime();
         Integer[] count = example.getCount();
         for (int i = 0; i < threads; i++) {
-            System.out.println((i + 1) + " : "
-                    + ((double)working[i] / (working[i] + waiting[i])) + " "
-                    + ((double)waiting[i] / (working[i] + waiting[i])) + " "
+            System.out.println(
+                    ((double)working[i] / (working[i] + waiting[i])) + "\t"
+                    + ((double)waiting[i] / (working[i] + waiting[i])) + "\t"
                     + (count[i]) + " ");
         }
     }

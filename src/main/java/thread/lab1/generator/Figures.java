@@ -12,7 +12,7 @@ public enum Figures {
         return (int) Math.sqrt(
                 halfP * (halfP - x.get(0)) * (halfP - x.get(1)) * (halfP - x.get(2))
         );
-    }, 10),
+    }, 30),
     CIRCLE((x) -> (int) (x.get(0) * Math.PI), 9),
     BOX((x) -> x.get(0) * x.get(1), 8);
 
